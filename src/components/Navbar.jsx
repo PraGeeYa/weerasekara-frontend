@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
@@ -18,6 +18,46 @@ const Navbar = () => {
     navigate('/login');
     window.location.reload(); 
   };
+
+  // --- Auto Logout for Inactivity (විනාඩි 15 ක් නිශ්ශබ්දව සිටියහොත්) ---
+  useEffect(() => {
+    // ලොග් වෙලා නැත්නම් මේක Run වෙන්න ඕනේ නැහැ
+    if (!token) return;
+
+    let timeoutId;
+    const INACTIVITY_TIME = 15 * 60 * 1000; // විනාඩි 15 (මිලි තත්පර වලින්)
+
+    // ඉබේම Logout කරන function එක
+    const autoLogout = () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userRole');
+      alert("ඔබ බොහෝ වේලාවක් කිසිදු ක්‍රියාකාරකමක් නොකළ බැවින් ආරක්ෂාව සඳහා ඉබේම Log Out විය. (Logged out due to inactivity) 🔒");
+      navigate('/login');
+      window.location.reload(); 
+    };
+
+    // මොකක් හරි කරපු ගමන් ටයිමර් එක මුල ඉඳන් පටන් ගන්නවා
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(autoLogout, INACTIVITY_TIME);
+    };
+
+    // User ගේ ක්‍රියාකාරකම් අඳුරගන්නා Events
+    const events = ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart'];
+
+    // මුලින්ම ටයිමර් එක පටන් ගන්න
+    resetTimer();
+
+    // Events වලට listener එකතු කිරීම
+    events.forEach(event => window.addEventListener(event, resetTimer));
+
+    // Component එක අයින් වෙද්දී (Cleanup)
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, resetTimer));
+    };
+  }, [token, navigate]);
 
   const userName = userEmail ? userEmail.split('@')[0] : 'User';
 
