@@ -10,7 +10,11 @@ const SystemLogs = () => {
     const fetchLogs = async () => {
       try {
         const response = await api.get('/logs');
-        setLogs(response.data);
+        console.log("Backend response data:", response.data); // මේ පේළිය අලුතින් එකතු කරන්න
+        // Backend එකෙන් එන්නේ Object එකක් නම් (උදා: {logs: [...]}) ඒකේ ලොග්ස් ටික ගන්න
+        // නැත්නම් කෙලින්ම response.data එකම පාවිච්චි කරන්න
+        const data = Array.isArray(response.data) ? response.data : (response.data.logs || []);
+        setLogs(data);
       } catch (err) {
         console.error("Error fetching logs:", err);
         setError("Failed to load system logs. Please check your connection.");
