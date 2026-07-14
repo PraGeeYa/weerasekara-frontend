@@ -31,23 +31,27 @@ const Navbar = () => {
         </span>
       </div>
 
-      {/* Main Content Container (min-h-[44px] දැම්මේ Logo එක මැදට ගත්තම height එක හැදෙන්න) */}
-      <div className="container mx-auto flex justify-between items-center relative z-10 min-h-[44px]">
+      {/* Main Content Container */}
+      <div className="container mx-auto relative z-10 min-h-[50px] grid grid-cols-3 md:flex md:justify-between items-center">
         
-        {/* Mobile View: වම් පැත්තේ හිස් ඉඩක් (Admin Layout Button එකට ඉඩ දෙන්න) */}
-        <div className="w-10 md:hidden"></div>
+        {/* --- Mobile View: Left Space (Admin Button Placeholder) --- */}
+        <div className="flex justify-start md:hidden">
+          <div className="w-10"></div> 
+        </div>
 
-        {/* Brand Logo - Mobile වලදී මැදට (Centered) එන්න හදලා තියෙන්නේ */}
-        <Link to="/" className="absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none flex items-center group z-10">
-          <img 
-            src="/logo.jpeg" 
-            alt="Weerasekara Concrete Work" 
-            className="h-10 md:h-16 object-contain rounded-xl md:rounded-2xl shadow-sm border border-slate-100 group-hover:shadow-md group-hover:scale-105 transition-all duration-300 bg-white" 
-          />
-        </Link>
+        {/* --- Brand Logo (Centered on Mobile, Left on Desktop) --- */}
+        <div className="flex justify-center md:justify-start">
+          <Link to="/" className="flex items-center group z-10">
+            <img 
+              src="/logo.jpeg" 
+              alt="Weerasekara Concrete Work" 
+              className="h-12 md:h-16 object-contain rounded-xl md:rounded-2xl shadow-sm border border-slate-100 group-hover:shadow-md group-hover:scale-105 transition-all duration-300 bg-white" 
+            />
+          </Link>
+        </div>
         
         {/* --- Desktop View (Right Side: Links & Auth Buttons) --- */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="hidden md:flex items-center space-x-6 justify-end w-full">
           
           <div className="space-x-6 font-extrabold text-slate-800">
             <Link to="/" className="hover:text-orange-600 transition">Home</Link>
@@ -92,27 +96,31 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* --- Mobile View (Hamburger Button) --- */}
-        <button 
-          className="md:hidden text-slate-900 text-3xl font-black focus:outline-none z-20"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? '✕' : '☰'}
-        </button>
+        {/* --- Mobile View (Hamburger Button) - Right aligned --- */}
+        <div className="flex justify-end md:hidden">
+          <button 
+            className="text-slate-900 text-3xl font-black focus:outline-none z-20 transition-transform active:scale-90"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+        </div>
 
       </div>
 
       {/* --- Mobile Dropdown Menu --- */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl shadow-xl border-b-4 border-orange-600 z-50 flex flex-col p-5 space-y-4 animate-fade-in">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl shadow-xl border-b-4 border-orange-600 z-50 flex flex-col p-5 space-y-4 animate-[fadeIn_0.2s_ease-out]">
           
           {/* Mobile Links */}
-          <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg">Home</Link>
+          <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg px-2 py-1 rounded-lg hover:bg-orange-50 transition-colors">Home</Link>
+          <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg px-2 py-1 rounded-lg hover:bg-orange-50 transition-colors">Contact Us</Link>
+          
           {userRole === 'admin' && (
             <>
-              <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg">Dashboard</Link>
-              <Link to="/admin/products" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg">Products</Link>
-              <Link to="/admin/orders" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg">Orders</Link>
+              <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg px-2 py-1 rounded-lg hover:bg-orange-50 transition-colors">Dashboard</Link>
+              <Link to="/admin/products" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg px-2 py-1 rounded-lg hover:bg-orange-50 transition-colors">Products</Link>
+              <Link to="/admin/orders" onClick={() => setIsMobileMenuOpen(false)} className="font-extrabold text-slate-800 hover:text-orange-600 text-lg px-2 py-1 rounded-lg hover:bg-orange-50 transition-colors">Orders</Link>
             </>
           )}
 
@@ -121,27 +129,27 @@ const Navbar = () => {
           {/* Mobile Auth Buttons */}
           {token ? (
             <div className="flex flex-col space-y-4">
-              <div className="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-sm">
                 <span className="text-slate-600 font-bold">
                   Hi, <span className="text-slate-900 capitalize">{userName}</span>
                 </span>
                 {userRole === 'admin' && (
-                  <span className="bg-slate-900 text-orange-400 text-xs px-2 py-1 rounded-full font-black uppercase tracking-wider">
+                  <span className="bg-slate-900 text-orange-400 text-xs px-3 py-1 rounded-full font-black uppercase tracking-wider">
                     Admin
                   </span>
                 )}
               </div>
               <button 
                 onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
-                className="w-full text-center bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl font-bold transition shadow-md"
+                className="w-full text-center bg-orange-600 hover:bg-orange-700 text-white px-5 py-3.5 rounded-xl font-bold transition shadow-md"
               >
                 Log Out
               </button>
             </div>
           ) : (
             <div className="flex flex-col space-y-3">
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-center text-slate-800 hover:bg-slate-50 font-extrabold transition px-2 py-3 border border-slate-200 rounded-xl">Login</Link>
-              <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="text-center bg-slate-900 text-white px-6 py-3 rounded-xl font-extrabold hover:bg-slate-800 shadow-md">Sign Up</Link>
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-center text-slate-800 hover:bg-slate-50 font-extrabold transition px-2 py-3.5 border border-slate-200 rounded-xl shadow-sm">Login</Link>
+              <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="text-center bg-slate-900 text-white px-6 py-3.5 rounded-xl font-extrabold hover:bg-slate-800 shadow-md">Sign Up</Link>
             </div>
           )}
         </div>
