@@ -4,6 +4,7 @@ import api from '../../services/api';
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Add & Edit Employee State
   const [empForm, setEmpForm] = useState({ name: '', position: 'Laborer', phone: '' });
@@ -32,7 +33,8 @@ const EmployeeManagement = () => {
         alert("Employee updated successfully! (සේවක දත්ත යාවත්කාලීන කරන ලදී!) ✅");
       } else {
         await api.post('/employees', empForm);
-        alert("New employee added! (නව සේවකයෙක් එකතු කරන ලදී!) 🎉");
+        setSuccessMessage('New employee added successfully!');
+        setTimeout(() => setSuccessMessage(''), 3000);
       }
       fetchEmployees();
       resetForm();
@@ -75,6 +77,20 @@ const EmployeeManagement = () => {
 
   return (
     <div className="p-6 md:p-8">
+      {successMessage && (
+        <div className="fixed top-6 right-6 z-50 max-w-sm rounded-2xl border border-emerald-200 bg-white/95 backdrop-blur-xl shadow-2xl shadow-emerald-200/30 p-4 animate-[fadeIn_0.25s_ease-out]">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 text-xl">
+              ✓
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-900">Success</p>
+              <p className="text-sm font-semibold text-slate-600">{successMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header Section */}
       <div className="mb-8">
         <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-2">
