@@ -6,7 +6,8 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'customer' // adminSecret කෑල්ල අයින් කරලා තියෙන්නේ
+    role: 'customer',
+    adminSecret: '' // Admin Secret එක සඳහා අලුතින් එකතු කළා
   });
   
   const [error, setError] = useState('');
@@ -34,22 +35,21 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-slate-100 to-orange-50 relative overflow-hidden">
       
-      {/* --- Background Watermark 'W' (මුළු තිරයටම යටින්) --- */}
+      {/* --- Background Watermark 'W' --- */}
       <div className="absolute inset-0 flex justify-center items-center pointer-events-none select-none z-0 opacity-[0.03]">
         <span className="text-[300px] md:text-[400px] font-black text-slate-900 tracking-tighter">
           W
         </span>
       </div>
 
-      {/* --- Left Side: Branding & Image (Desktop වලට විතරක් පේනවා) --- */}
+      {/* --- Left Side: Branding & Image --- */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 overflow-hidden shadow-2xl z-10">
-        {/* අන්තර්ජාලයෙන් ගත්තු ඉදිකිරීම් වලට ගැලපෙන වෙනත් පින්තූරයක් */}
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80')] bg-cover bg-center opacity-30 mix-blend-overlay transform hover:scale-105 transition-transform duration-1000"></div>
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-orange-900/60"></div>
         
         <div className="relative z-10 flex flex-col justify-center items-start p-16 w-full h-full">
           <div className="bg-white p-3 rounded-2xl mb-8 shadow-lg inline-block">
-            <img src="/logo.jpeg" alt="Logo" className="h-16 object-contain rounded-xl" />
+            <img src="/logo2.jpeg" alt="Logo" className="h-16 object-contain rounded-xl" />
           </div>
           <h1 className="text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tight drop-shadow-md">
             JOIN OUR <br/>
@@ -63,16 +63,13 @@ const Signup = () => {
         </div>
       </div>
 
-      {/* --- Right Side: Signup Form (Mobile & Desktop දෙකටම) --- */}
+      {/* --- Right Side: Signup Form --- */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 md:p-12 relative z-10">
-        
-        {/* Glassmorphism Form Card */}
         <div className="w-full max-w-md bg-white/80 lg:bg-white/70 backdrop-blur-2xl p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/60">
           
-          {/* --- Mobile View Branding (Phone එකෙන් එන අයට විතරක් පේන්න) --- */}
           <div className="lg:hidden flex flex-col items-center text-center mb-8">
             <div className="bg-white p-2 rounded-2xl mb-4 shadow-md inline-block border border-slate-100">
-              <img src="/logo.jpeg" alt="Logo" className="h-14 object-contain rounded-xl" />
+              <img src="/logo2.jpeg" alt="Logo" className="h-14 object-contain rounded-xl" />
             </div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
               WEERASEKARA
@@ -82,27 +79,18 @@ const Signup = () => {
             </h2>
           </div>
 
-          {/* Desktop Title */}
           <div className="text-center mb-8 hidden lg:block">
             <h2 className="text-3xl font-black text-slate-900 mb-2 tracking-tight">Create Account ✨</h2>
             <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">Join our platform today</p>
           </div>
 
-          {/* Mobile Text */}
-          <div className="text-center mb-6 lg:hidden">
-            <p className="text-slate-500 font-extrabold text-xs uppercase tracking-widest bg-slate-100/50 py-2 rounded-lg">
-              Create New Account
-            </p>
-          </div>
-
-          {/* Alerts */}
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 text-center shadow-sm animate-fade-in flex items-center justify-center gap-2">
+            <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 text-center shadow-sm flex items-center justify-center gap-2">
               <span>⚠️</span> {error}
             </div>
           )}
           {success && (
-            <div className="bg-green-50 border border-green-100 text-green-600 p-4 rounded-xl text-sm font-bold mb-6 text-center shadow-sm animate-fade-in flex items-center justify-center gap-2">
+            <div className="bg-green-50 border border-green-100 text-green-600 p-4 rounded-xl text-sm font-bold mb-6 text-center shadow-sm flex items-center justify-center gap-2">
               <span>✅</span> {success} Redirecting...
             </div>
           )}
@@ -148,6 +136,22 @@ const Signup = () => {
               </select>
             </div>
 
+            {/* Admin Secret Key Field (Role එක admin නම් විතරක් පෙනේ) */}
+            {formData.role === 'admin' && (
+              <div className="animate-fade-in">
+                <label className="block text-xs font-black text-red-600 mb-1.5 uppercase tracking-wide">Admin Secret Key</label>
+                <input 
+                  type="password" 
+                  name="adminSecret" 
+                  value={formData.adminSecret} 
+                  onChange={handleChange} 
+                  required 
+                  className="w-full p-4 bg-red-50 border border-red-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-all font-bold text-slate-800 placeholder-red-300" 
+                  placeholder="Enter secure admin key"
+                />
+              </div>
+            )}
+
             <button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-black text-lg py-4 px-4 rounded-xl shadow-md hover:shadow-lg hover:shadow-orange-500/30 transition-all transform hover:-translate-y-1 mt-6">
               CREATE ACCOUNT
             </button>
@@ -163,7 +167,6 @@ const Signup = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };
