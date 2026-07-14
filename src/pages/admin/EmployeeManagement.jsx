@@ -55,7 +55,8 @@ const EmployeeManagement = () => {
     if (window.confirm("Are you sure you want to delete this employee? (මෙම සේවකයා ඉවත් කිරීමට ඔබට විශ්වාසද?) ⚠️")) {
       try {
         await api.delete(`/employees/${id}`);
-        alert("Employee removed successfully! (සේවකයා ඉවත් කරන ලදී!)");
+        setSuccessMessage('Employee removed successfully!');
+        setTimeout(() => setSuccessMessage(''), 3000);
         fetchEmployees();
       } catch (error) {
         console.error("Error deleting employee:", error);
