@@ -57,7 +57,7 @@ const SystemLogs = () => {
   return (
     <div className="p-6">
       <h2 className="text-3xl font-extrabold text-gray-800 mb-2">System Activity Logs 🕵️‍♂️</h2>
-      <p className="text-gray-500 font-medium mb-6">Track all admin actions, IP addresses, and data changes.</p>
+      <p className="text-gray-500 font-medium mb-6">Track all admin actions, IP addresses, and data changes</p>
 
       {/* Error එකක් ආවොත් පෙන්වන්න */}
       {error && (
