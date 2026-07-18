@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
-// AreaChart සහ Area අලුතින් import කරගත්තා
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 const AdminDashboard = () => {
@@ -14,11 +13,11 @@ const AdminDashboard = () => {
   
   const [barChartData, setBarChartData] = useState([]);
   const [pieChartData, setPieChartData] = useState([]);
-  const [dailyChartData, setDailyChartData] = useState([]); // අලුත් දෛනික ප්‍රස්තාරය සඳහා
+  const [dailyChartData, setDailyChartData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ලෝගෝ එකට ගැලපෙන වර්ණ (Navy Blue, Burnt Orange, Slate, Blue)
-  const COLORS = ['#ea580c', '#0f172a', '#3b82f6', '#f97316', '#64748b'];
+  // Dark Theme එකට ගැලපෙන දීප්තිමත් වර්ණ (Bright/Neon Colors for Dark Mode)
+  const COLORS = ['#ea580c', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -40,7 +39,7 @@ const AdminDashboard = () => {
           employees: employeesRes.data.length || 0,
         });
 
-        // 1. Bar Chart Data (කාණ්ඩ අනුව / By Category)
+        // 1. Bar Chart Data
         const catTotals = {};
         txRes.data.forEach(tx => {
           if (!catTotals[tx.category]) {
@@ -51,10 +50,9 @@ const AdminDashboard = () => {
         });
         setBarChartData(Object.values(catTotals));
 
-        // 2. Daily Area Chart Data (දෛනික වාර්තා / Day-by-Day)
+        // 2. Daily Area Chart Data
         const dailyTotals = {};
         txRes.data.forEach(tx => {
-          // දවස වෙන් කරගන්නවා (උදා: "Jul 14")
           const d = new Date(tx.createdAt);
           const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); 
           
@@ -65,11 +63,10 @@ const AdminDashboard = () => {
           if (tx.type === 'expense') dailyTotals[dateStr].Expense += tx.amount;
         });
         
-        // දින අනුපිළිවෙලට (පිළිවෙලට) හදාගන්නවා
         const sortedDailyData = Object.values(dailyTotals).sort((a, b) => a.timestamp - b.timestamp);
         setDailyChartData(sortedDailyData);
 
-        // 3. Pie Chart Data (සේවක තනතුරු / Employee Positions)
+        // 3. Pie Chart Data
         const roleCounts = {};
         employeesRes.data.forEach(emp => {
           const role = emp.position || 'Other';
@@ -91,90 +88,147 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  // වීදුරු (Glassmorphism) ඉෆෙක්ට් එක සඳහා පොදු CSS පන්තිය
-  const glassClass = "bg-white/70 backdrop-blur-xl border border-white/50 shadow-xl shadow-slate-200/50 rounded-2xl p-6";
+  // Ultra-Modern Dark Glassmorphism Class
+  const glassCard = "bg-slate-900/40 backdrop-blur-2xl border border-white/5 shadow-[0_15px_30px_rgba(0,0,0,0.5)] rounded-[2rem] p-6 md:p-8 transition-all duration-500 ease-[cubic-bezier(0.25,0.8,0.25,1)] hover:shadow-[0_20px_40px_rgba(234,88,12,0.12)] hover:border-orange-500/20";
 
   const stats = [
-    { title: "Total Orders (මුළු ඇණවුම්)", value: loading ? "..." : statsData.orders.toString(), icon: "📦", color: "from-slate-700 to-slate-900" },
-    { title: "Total Revenue (මුළු ආදායම)", value: loading ? "..." : `Rs. ${statsData.revenue.toLocaleString()}`, icon: "💰", color: "from-orange-500 to-orange-700" },
-    { title: "Total Products (නිෂ්පාදන)", value: loading ? "..." : statsData.products.toString(), icon: "🧱", color: "from-blue-600 to-blue-800" },
-    { title: "Active Staff (සේවකයින්)", value: loading ? "..." : statsData.employees.toString(), icon: "👥", color: "from-slate-600 to-slate-800" },
+    { title: "Total Orders", sub: "මුළු ඇණවුම්", value: loading ? "..." : statsData.orders.toString(), icon: "📦", color: "from-blue-600 to-blue-400", shadow: "shadow-blue-500/30" },
+    { title: "Total Revenue", sub: "මුළු ආදායම", value: loading ? "..." : `Rs. ${statsData.revenue.toLocaleString()}`, icon: "💰", color: "from-orange-600 to-orange-400", shadow: "shadow-orange-500/30" },
+    { title: "Total Products", sub: "නිෂ්පාදන", value: loading ? "..." : statsData.products.toString(), icon: "🧱", color: "from-emerald-600 to-emerald-400", shadow: "shadow-emerald-500/30" },
+    { title: "Active Staff", sub: "සේවකයින්", value: loading ? "..." : statsData.employees.toString(), icon: "👥", color: "from-purple-600 to-purple-400", shadow: "shadow-purple-500/30" },
   ];
 
   return (
-    <div className="relative p-6 md:p-8 min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-orange-50 overflow-hidden">
+    <div className="relative min-h-screen bg-slate-950 text-white font-sans overflow-hidden p-4 md:p-8 selection:bg-orange-500 selection:text-white">
       
-      {/* Decorative Background Blobs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-orange-300/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob pointer-events-none"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-300/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 pointer-events-none"></div>
-      <div className="absolute -bottom-8 left-20 w-96 h-96 bg-slate-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000 pointer-events-none"></div>
+      {/* --- ADVANCED CUSTOM ANIMATIONS --- */}
+      <style>
+        {`
+          @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee {
+            display: flex;
+            white-space: nowrap;
+            animation: marquee 30s linear infinite;
+          }
+          @keyframes fade-in-up {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fade-in-up {
+            animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+          /* Grid Pattern Background */
+          .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+          }
+        `}
+      </style>
 
-      <div className="relative z-10">
+      {/* --- Background Ambient Glows & Grid --- */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute inset-0 bg-grid-pattern pointer-events-none"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600/15 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
+      </div>
+
+      {/* --- MOVING BACKGROUND TEXT (Marquee) --- */}
+      <div className="fixed bottom-10 left-0 w-full overflow-hidden z-0 opacity-[0.03] select-none pointer-events-none">
+        <div className="animate-marquee text-[5rem] md:text-[10rem] font-black uppercase text-white w-max flex gap-12 leading-none">
+          <span>Weerasekara Concrete Work</span>
+          <span>•</span>
+          <span>Weerasekara Concrete Work</span>
+          <span>•</span>
+          <span>Weerasekara Concrete Work</span>
+          <span>•</span>
+        </div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto">
         
         {/* Main Title Section */}
-        <div className="text-center mb-12 mt-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-wider text-slate-900 drop-shadow-sm">
-            WEERASEKARA <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-700">CONCRETE WORKS</span>
-          </h1>
-          <p className="text-slate-500 font-extrabold mt-3 uppercase tracking-[0.3em] text-xs md:text-sm">
-            Official Management Dashboard (ප්‍රධාන පාලන පුවරුව)
-          </p>
-        </div>
-
-        {/* Section Header */}
-        <div className="mb-6 flex items-center">
-          <span className="bg-orange-100 text-orange-600 p-2.5 rounded-xl mr-4 shadow-sm text-xl">📈</span>
+        <div className="mb-10 mt-4 animate-fade-in-up flex justify-between items-end border-b border-white/10 pb-6">
           <div>
-            <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Business Overview (ව්‍යාපාරික සාරාංශය)</h2>
-            <p className="text-slate-500 font-bold text-sm">Real-time insights and metrics (තත්‍ය කාලීන දත්ත).</p>
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white drop-shadow-md flex items-center gap-4">
+              <div className="bg-slate-900 border border-white/10 p-3 rounded-2xl shadow-inner">
+                <span className="text-3xl">📊</span>
+              </div>
+              <div>
+                Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">Dashboard</span>
+              </div>
+            </h1>
+            <p className="text-slate-400 font-bold mt-2 uppercase tracking-widest text-xs">
+              Official Management Portal (ප්‍රධාන පාලන පුවරුව)
+            </p>
+          </div>
+          <div className="hidden md:block">
+            <div className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Live Sync Active
+            </div>
           </div>
         </div>
 
         {/* Top Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, index) => (
-            <div key={index} className={`${glassClass} flex items-center hover:bg-white/90 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-100/50`}>
-              <div className={`bg-gradient-to-br ${stat.color} text-white text-3xl p-4 rounded-xl mr-5 shadow-lg flex items-center justify-center w-16 h-16`}>
+            <div 
+              key={index} 
+              className={`${glassCard} flex items-center transform hover:-translate-y-2 group animate-fade-in-up`}
+              style={{ animationDelay: `${index * 0.1}s`, opacity: 0 }}
+            >
+              <div className={`bg-gradient-to-br ${stat.color} text-white text-3xl p-4 rounded-2xl mr-5 shadow-lg ${stat.shadow} flex items-center justify-center w-16 h-16 group-hover:scale-110 transition-transform duration-500`}>
                 {stat.icon}
               </div>
               <div>
-                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">{stat.title}</p>
-                <h3 className="text-2xl font-black text-slate-800">{stat.value}</h3>
+                <h3 className="text-2xl font-black text-white drop-shadow-md">{stat.value}</h3>
+                <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mt-1">{stat.title}</p>
+                <p className="text-[10px] text-orange-500/80 font-bold mt-0.5">{stat.sub}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Day-by-Day Area Chart (දෛනික ප්‍රස්තාරය) */}
-        <div className={`${glassClass} mb-10`}>
-          <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center">
-            <span className="text-2xl mr-2">📅</span> Daily Cash Flow (දෛනික මුදල් ගලනය)
+        <div className={`${glassCard} mb-10 animate-fade-in-up`} style={{ animationDelay: '0.4s', opacity: 0 }}>
+          <h3 className="text-xl font-black text-white mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
+            <span className="text-2xl">📈</span> 
+            <div>
+              Daily Cash Flow <span className="text-sm text-slate-400 font-bold ml-2">(දෛනික මුදල් ගලනය)</span>
+            </div>
           </h3>
-          <div className="h-80 w-full">
+          <div className="h-[350px] w-full">
             {loading ? (
-              <div className="h-full flex items-center justify-center text-slate-400 font-bold">Loading Chart...</div>
+              <div className="h-full flex items-center justify-center text-slate-500 font-bold animate-pulse">Loading Chart Data...</div>
             ) : dailyChartData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-slate-400 font-bold">No daily data available.</div>
+              <div className="h-full flex items-center justify-center text-slate-500 font-bold">No daily data available.</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={dailyChartData} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+                <AreaChart data={dailyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0f172a" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#0f172a" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ea580c" stopOpacity={0.8}/>
+                      <stop offset="5%" stopColor="#ea580c" stopOpacity={0.4}/>
                       <stop offset="95%" stopColor="#ea580c" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.5} />
-                  <XAxis dataKey="date" tick={{fill: '#475569', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} />
-                  <YAxis tick={{fill: '#475569', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} tickFormatter={(value) => `Rs.${value}`} />
-                  <Tooltip contentStyle={{borderRadius: '16px', border: 'none', backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(8px)', fontWeight: 'bold', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} />
-                  <Legend wrapperStyle={{paddingTop: '20px', fontWeight: 'bold'}} />
-                  <Area type="monotone" dataKey="Income" stroke="#0f172a" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" />
-                  <Area type="monotone" dataKey="Expense" stroke="#ea580c" strokeWidth={3} fillOpacity={1} fill="url(#colorExpense)" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="date" tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} tickFormatter={(value) => `Rs.${value}`} dx={-10} />
+                  <Tooltip 
+                    contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(8px)', color: '#fff', fontWeight: 'bold', boxShadow: '0 20px 40px rgba(0,0,0,0.5)'}}
+                    itemStyle={{color: '#fff'}} 
+                  />
+                  <Legend wrapperStyle={{paddingTop: '20px', fontWeight: 'bold', color: '#cbd5e1'}} />
+                  <Area type="monotone" dataKey="Income" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorIncome)" />
+                  <Area type="monotone" dataKey="Expense" stroke="#ea580c" strokeWidth={4} fillOpacity={1} fill="url(#colorExpense)" />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -185,25 +239,31 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
           
           {/* Bar Chart: Financial Flow by Category */}
-          <div className={`lg:col-span-2 ${glassClass}`}>
-            <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center">
-              <span className="text-2xl mr-2">📊</span> Cash Flow by Category (කාණ්ඩ අනුව වාර්තාව)
+          <div className={`lg:col-span-2 ${glassCard} animate-fade-in-up`} style={{ animationDelay: '0.5s', opacity: 0 }}>
+            <h3 className="text-xl font-black text-white mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
+              <span className="text-2xl">📊</span> 
+              <div>
+                Cash Flow by Category <span className="text-sm text-slate-400 font-bold ml-2">(කාණ්ඩ අනුව වාර්තාව)</span>
+              </div>
             </h3>
-            <div className="h-80 w-full">
+            <div className="h-[300px] w-full">
               {loading ? (
-                <div className="h-full flex items-center justify-center text-slate-400 font-bold">Loading Chart...</div>
+                <div className="h-full flex items-center justify-center text-slate-500 font-bold animate-pulse">Loading Chart Data...</div>
               ) : barChartData.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-400 font-bold">No transaction data available.</div>
+                <div className="h-full flex items-center justify-center text-slate-500 font-bold">No transaction data available.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.5} />
-                    <XAxis dataKey="name" tick={{fill: '#475569', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} />
-                    <YAxis tick={{fill: '#475569', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} tickFormatter={(value) => `Rs.${value}`} />
-                    <Tooltip cursor={{fill: '#f1f5f9', opacity: 0.4}} contentStyle={{borderRadius: '16px', border: '1px solid #e2e8f0', backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(8px)', fontWeight: 'bold'}} />
+                  <BarChart data={barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="name" tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} dy={10} />
+                    <YAxis tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} axisLine={false} tickLine={false} tickFormatter={(value) => `Rs.${value}`} dx={-10} />
+                    <Tooltip 
+                      cursor={{fill: 'rgba(255,255,255,0.05)'}} 
+                      contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(8px)', color: '#fff', fontWeight: 'bold'}} 
+                    />
                     <Legend wrapperStyle={{paddingTop: '20px', fontWeight: 'bold'}} />
-                    <Bar dataKey="Income" fill="#0f172a" radius={[6, 6, 0, 0]} barSize={35} />
-                    <Bar dataKey="Expense" fill="#ea580c" radius={[6, 6, 0, 0]} barSize={35} />
+                    <Bar dataKey="Income" fill="#10b981" radius={[6, 6, 0, 0]} barSize={30} />
+                    <Bar dataKey="Expense" fill="#ea580c" radius={[6, 6, 0, 0]} barSize={30} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -211,34 +271,41 @@ const AdminDashboard = () => {
           </div>
 
           {/* Pie Chart: Employee Distribution */}
-          <div className={`${glassClass}`}>
-            <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center">
-              <span className="text-2xl mr-2">👷‍♂️</span> Staff Roles (සේවක ව්‍යාප්තිය)
+          <div className={`${glassCard} animate-fade-in-up`} style={{ animationDelay: '0.6s', opacity: 0 }}>
+            <h3 className="text-xl font-black text-white mb-6 flex items-center gap-3 border-b border-white/5 pb-4">
+              <span className="text-2xl">👷‍♂️</span> 
+              <div>
+                Staff Roles <span className="text-sm text-slate-400 font-bold ml-2">(සේවක ව්‍යාප්තිය)</span>
+              </div>
             </h3>
-            <div className="h-80 w-full">
+            <div className="h-[300px] w-full">
               {loading ? (
-                <div className="h-full flex items-center justify-center text-slate-400 font-bold">Loading Chart...</div>
+                <div className="h-full flex items-center justify-center text-slate-500 font-bold animate-pulse">Loading Chart Data...</div>
               ) : pieChartData.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-400 font-bold">No staff data available.</div>
+                <div className="h-full flex items-center justify-center text-slate-500 font-bold">No staff data available.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={pieChartData}
                       cx="50%"
-                      cy="50%"
-                      innerRadius={75}
-                      outerRadius={105}
-                      paddingAngle={6}
+                      cy="45%"
+                      innerRadius={70}
+                      outerRadius={100}
+                      paddingAngle={5}
                       dataKey="value"
-                      stroke="none"
+                      stroke="rgba(0,0,0,0.5)"
+                      strokeWidth={3}
                     >
                       {pieChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{borderRadius: '16px', border: '1px solid #e2e8f0', backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(8px)', fontWeight: 'bold'}} />
-                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{fontWeight: 'bold'}} />
+                    <Tooltip 
+                      contentStyle={{borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(15, 23, 42, 0.9)', color: '#fff', fontWeight: 'bold'}} 
+                      itemStyle={{color: '#fff'}}
+                    />
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{fontWeight: 'bold', fontSize: '12px', color: '#cbd5e1'}} />
                   </PieChart>
                 </ResponsiveContainer>
               )}
@@ -247,36 +314,40 @@ const AdminDashboard = () => {
         </div>
 
         {/* Quick Actions Panel */}
-        <h3 className="text-xl font-black text-slate-800 mb-4 mt-8 flex items-center">
-          <span className="text-2xl mr-2">⚡</span> Quick Shortcuts (ඉක්මන් පිවිසුම්)
+        <h3 className="text-xl font-black text-white mb-6 mt-12 flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: '0.7s', opacity: 0 }}>
+          <span className="text-2xl">⚡</span> Quick Shortcuts (ඉක්මන් පිවිසුම්)
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link to="/admin/orders" className={`${glassClass} hover:border-orange-400 hover:bg-white/90 transition group flex items-center`}>
-            <div className="bg-slate-100 text-slate-700 p-4 rounded-xl mr-4 group-hover:bg-slate-900 group-hover:text-orange-400 transition shadow-sm">📦</div>
-            <div>
-              <h4 className="text-lg font-black text-slate-800 group-hover:text-orange-600 transition">Manage Orders</h4>
-              <p className="text-slate-500 font-bold text-xs mt-1">ඇණවුම් පාලනය</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '0.8s', opacity: 0 }}>
+          <Link to="/admin/orders" className={`${glassCard} !p-6 hover:border-orange-500 hover:bg-slate-800/50 transition group flex items-center relative overflow-hidden`}>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="bg-slate-950 border border-white/5 text-white p-4 rounded-2xl mr-5 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-400 transition-all shadow-inner text-2xl relative z-10">📦</div>
+            <div className="relative z-10">
+              <h4 className="text-lg font-black text-white group-hover:text-orange-400 transition-colors uppercase tracking-wide">Manage Orders</h4>
+              <p className="text-slate-400 font-bold text-xs mt-1">ඇණවුම් පාලනය</p>
             </div>
           </Link>
           
-          <Link to="/admin/finance" className={`${glassClass} hover:border-orange-400 hover:bg-white/90 transition group flex items-center`}>
-            <div className="bg-slate-100 text-slate-700 p-4 rounded-xl mr-4 group-hover:bg-slate-900 group-hover:text-orange-400 transition shadow-sm">💵</div>
-            <div>
-              <h4 className="text-lg font-black text-slate-800 group-hover:text-orange-600 transition">Finance & Cashier</h4>
-              <p className="text-slate-500 font-bold text-xs mt-1">මුදල් පාලනය</p>
+          <Link to="/admin/finance" className={`${glassCard} !p-6 hover:border-orange-500 hover:bg-slate-800/50 transition group flex items-center relative overflow-hidden`}>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="bg-slate-950 border border-white/5 text-white p-4 rounded-2xl mr-5 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-400 transition-all shadow-inner text-2xl relative z-10">💵</div>
+            <div className="relative z-10">
+              <h4 className="text-lg font-black text-white group-hover:text-orange-400 transition-colors uppercase tracking-wide">Finance System</h4>
+              <p className="text-slate-400 font-bold text-xs mt-1">මුදල් පාලනය</p>
             </div>
           </Link>
 
-          <Link to="/admin/employees" className={`${glassClass} hover:border-orange-400 hover:bg-white/90 transition group flex items-center`}>
-            <div className="bg-slate-100 text-slate-700 p-4 rounded-xl mr-4 group-hover:bg-slate-900 group-hover:text-orange-400 transition shadow-sm">👷‍♂️</div>
-            <div>
-              <h4 className="text-lg font-black text-slate-800 group-hover:text-orange-600 transition">Payroll System</h4>
-              <p className="text-slate-500 font-bold text-xs mt-1">සේවක ගෙවීම්</p>
+          <Link to="/admin/employees" className={`${glassCard} !p-6 hover:border-orange-500 hover:bg-slate-800/50 transition group flex items-center relative overflow-hidden`}>
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="bg-slate-950 border border-white/5 text-white p-4 rounded-2xl mr-5 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-400 transition-all shadow-inner text-2xl relative z-10">👷‍♂️</div>
+            <div className="relative z-10">
+              <h4 className="text-lg font-black text-white group-hover:text-orange-400 transition-colors uppercase tracking-wide">Payroll & Staff</h4>
+              <p className="text-slate-400 font-bold text-xs mt-1">සේවක ගෙවීම්</p>
             </div>
           </Link>
         </div>
-      </div>
 
+      </div>
     </div>
   );
 };
